@@ -1,0 +1,26 @@
+{
+    "scrollDesc": {
+        "en": "In percent (%) of navigator height.",
+        "fr": "En pourcentage (%) de la hauteur du navigateur."
+    },
+    "scrollDesc2": {
+        "en": "Use : '-1%' to always show the navbar. '-2%' to show the navbar when scrolling up. '-3%' to let the navbar on top of the page. ",
+        "fr": "Utilisez : '-1%' pour toujours afficher la barre de navigation. '-2%' pour afficher la barre de navigation lors d'un déplacement vertical. '-3% pour laisser la barre de navigation en haut de la page.'"
+    },
+    "percent": {
+        "en": "Percent - %",
+        "fr": "Pourcent - %"
+    },
+    "afterSectionTitle": {
+        "en": "Amount of scroll before the second part of the navbar appears",
+        "fr": "Montant du scroll avant que la deuxième partie barre de navigation n'apparaisse"
+    },
+    "scrollTitle": {
+        "en": "Amount of scroll before the navbar appears",
+        "fr": "Montant du scroll avant que la barre de navigation n'apparaisse"
+    },
+    "radioTitle": {
+        "en": "Disable the second part of the navbar",
+        "fr": "Désactiver la deuxième partie de la barre de navigation"
+    }
+}
