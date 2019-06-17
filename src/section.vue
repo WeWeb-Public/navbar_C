@@ -13,11 +13,8 @@
             </div>
             <!-- wwManager:end -->
         </div>
-        <div
-            class="navbar-top"
-            :class="{'show': show, 'no-anim': section.data.appearPercent == null, 'fixed-nav': section.data.appearPercent != -3, 'shadow': displayShadow, 'show-bottom': secondNavShow}"
-        >
-            <div class="container">
+        <div class="navbar-top" :class="{'show': show, 'no-anim': section.data.appearPercent == null, 'fixed-nav': section.data.appearPercent != -3, 'shadow': displayShadow, }">
+            <div class="container" :class="{'show-bottom':   secondNavShow || editMode}">
                 <!-- wwManager:start -->
                 <wwSectionEditMenu size="small" :sectionCtrl="sectionCtrl" :options="openOptions"></wwSectionEditMenu>
                 <!-- wwManager:end -->
@@ -27,18 +24,19 @@
                 <wwLayoutColumn tag="div" ww-default="ww-row" :ww-list="section.data.rows" class="content" @ww-add="add(section.data.rows, $event)" @ww-remove="remove(section.data.rows, $event)">
                     <wwObject v-for="row in section.data.rows" :key="row.uniqueId" :ww-object="row"></wwObject>
                 </wwLayoutColumn>
-
-                <wwLayoutColumn
-                    v-if="!navbarCSecondPart && secondNavShow"
-                    tag="div"
-                    ww-default="ww-row"
-                    :ww-list="section.data.rowsBottom"
-                    class="content"
-                    @ww-add="add(section.data.rowsBottom, $event)"
-                    @ww-remove="remove(section.data.rowsBottom, $event)"
-                >
-                    <wwObject v-for="rowBottom in section.data.rowsBottom" :key="rowBottom.uniqueId" :ww-object="rowBottom"></wwObject>
-                </wwLayoutColumn>
+                <transition name="fade">
+                    <wwLayoutColumn
+                        v-if="!navbarCSecondPart && secondNavShow  || editMode"
+                        tag="div"
+                        ww-default="ww-row"
+                        :ww-list="section.data.rowsBottom"
+                        class="content"
+                        @ww-add="add(section.data.rowsBottom, $event)"
+                        @ww-remove="remove(section.data.rowsBottom, $event)"
+                    >
+                        <wwObject v-for="rowBottom in section.data.rowsBottom" :key="rowBottom.uniqueId" :ww-object="rowBottom"></wwObject>
+                    </wwLayoutColumn>
+                </transition>
             </div>
         </div>
 
@@ -117,6 +115,9 @@ export default {
         },
         navbarCSecondPart() {
             return this.section.data.secondPartToggle
+        },
+        editMode() {
+            return this.sectionCtrl.getEditMode() == 'CONTENT'
         }
     },
     watch: {
@@ -124,7 +125,7 @@ export default {
             if (this.show && this.$el) {
                 let height = this.$el.querySelector('.navbar-top').getBoundingClientRect().height;
 
-                wwLib.wwNavbar.updateHeight(height);
+                wwLib.wwNavbar.updateHeight(70);
             }
             else {
                 wwLib.wwNavbar.updateHeight(0);
@@ -133,7 +134,7 @@ export default {
         secondNavShow() {
             if (this.secondNavShow && this.$el) {
                 let height = this.$el.querySelector('.navbar-top').getBoundingClientRect().height;
-                wwLib.wwNavbar.updateHeight(height);
+                wwLib.wwNavbar.updateHeight(140);
             }
             else {
                 wwLib.wwNavbar.updateHeight(0);
@@ -197,6 +198,7 @@ export default {
             } else {
                 this.setScrollPercent();
             }
+            this.setSecondBarScrollPercent()
 
         },
         onResize() {
@@ -211,20 +213,20 @@ export default {
                 this.show = true;
                 return;
             }
-
             const scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-
             let scrollPercent = Math.max(0, 100 * scrollTop / this.windowHeight) - 0.0001;
 
-            /*
-            if (this.windowHeight + scrollTop >= document.body.clientHeight) {
-                scrollPercent = 99999999;
-            }
-            */
-
             this.show = scrollPercent >= this.section.data.appearPercent;
-            this.secondNavShow = scrollPercent >= this.section.data.secondPartAppearPercent
+        },
+        setSecondBarScrollPercent() {
+            if (this.section.data.secondPartAppearPercent == null) {
+                this.secondNavShow = true;
+                return;
+            }
+            const scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+            let scrollPercent = Math.max(0, 100 * scrollTop / this.windowHeight) - 0.0001;
 
+            this.secondNavShow = scrollPercent >= this.section.data.secondPartAppearPercent
         },
         setScrollUp() {
 
@@ -233,7 +235,6 @@ export default {
 
             const scrollPercent = Math.max(0, 100 * scrollTop / this.windowHeight) - 0.0001;
 
-            console.log(lastScrollTop)
             this.show = (lastScrollTop > 5) ? scrollPercent < lastScrollTop : false
 
             this.lastScrollTop = scrollPercent
@@ -308,7 +309,7 @@ export default {
             needUpdate = false;
         }
         if (!this.section.data.secondPartAppearPercent) {
-            this.section.data.secondPartAppearPercent = null;
+            this.section.data.secondPartAppearPercent = 30;
             needUpdate = false;
         }
         if (!this.section.data.secondPartToggle) {
@@ -421,15 +422,16 @@ export default {
         &.shadow {
             box-shadow: 0 2px 10px 0 rgba(74, 74, 74, 0.2);
         }
-        &.show-bottom {
-            height: 140px;
-            transition: all 0.5s ease;
-        }
+
         .container {
             width: 100%;
             height: 70px;
-            transition: all 0.5s ease;
-
+            transition: all 0.5s ease-in;
+            &.show-bottom {
+                @media (min-width: 1024px) {
+                    height: 140px;
+                }
+            }
             &.navbar_C-open {
                 transform: translateY(-20px);
             }
@@ -437,7 +439,9 @@ export default {
             &.no-anim {
                 transition: none;
             }
-
+            &.second-navbar {
+                transition: all 5s ease;
+            }
             .background {
                 position: absolute;
                 top: 0;
@@ -500,6 +504,18 @@ export default {
                 overflow-x: hidden;
             }
         }
+    }
+    /* Enter and leave animations can use different */
+    /* durations and timing functions.              */
+    .fade-enter-active {
+        transition: all 0.2s ease 0.3s;
+    }
+    .fade-leave-active {
+        //transition: all 0.4s ease;
+    }
+    .fade-enter, .fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
     }
 }
 </style>

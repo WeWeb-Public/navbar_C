@@ -5,7 +5,7 @@
         "type": "git",
         "url": "https://github.com/WeWeb-Public/navbar_C"
     },
-    "version": "0.0.12",
+    "version": "0.0.2",
     "private": true,
     "scripts": {
         "build": "weweb-build",

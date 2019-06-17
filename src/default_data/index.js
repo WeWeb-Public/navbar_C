@@ -6,7 +6,7 @@ module.exports = [
             en: "navbar_c"
         },
         storeDesc: {
-            en: "Navbar that unfold after a specific section"
+            en: "Navbar that unfold after a specific percentage"
         }
     }
 ]
